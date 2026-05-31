@@ -1,0 +1,33 @@
+# Ambiente Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Variáveis de ambiente — NUNCA commitar .env real
+.env
+
+# Armazenamento de fotos (dev)
+storage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Alembic
+alembic/__pycache__/
+
+# Pytest
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Logs
+*.log

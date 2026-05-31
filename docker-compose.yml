@@ -1,0 +1,47 @@
+services:
+
+  # ── PostgreSQL + PostGIS ──────────────────────────────────────────
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: sara_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sara_db
+      POSTGRES_USER: sara
+      POSTGRES_PASSWORD: sara
+    ports:
+      - "5432:5432"
+    volumes:
+      - sara_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sara -d sara_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── API FastAPI (dev — hot-reload) ────────────────────────────────
+  api:
+    build: .
+    container_name: sara_api
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      # Hot-reload: monta o código local dentro do container
+      - .:/app
+      - sara_storage:/app/storage
+    environment:
+      DATABASE_URL: postgresql://sara:sara@db:5432/sara_db
+      JWT_SECRET: dev_secret_change_in_prod
+      ENV: dev
+      CORS_ORIGINS: "*"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  sara_pgdata:
+  sara_storage:
